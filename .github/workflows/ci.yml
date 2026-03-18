@@ -2,7 +2,7 @@ name: User Service CI/CD
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "UserService" ]
   pull_request:
     branches: [ "main", "master" ]
 
