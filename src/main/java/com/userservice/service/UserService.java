@@ -6,6 +6,8 @@ import com.userservice.entity.User;
 import com.userservice.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.userservice.mapper.UserMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class UserService {
         return userMapper.toDto(userRepository.save(user));
     }
 
+    @Cacheable(value = "users", key = "#id")
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found, id: " + id));
@@ -43,6 +46,7 @@ public class UserService {
                 .map(userMapper::toDto);
     }
 
+    @CacheEvict(value = "users", key = "#id")
     @Transactional
     public UserDto updateUser(Long id, UserDto userDto) {
         User user = userRepository.findById(id)
@@ -54,6 +58,7 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
+    @CacheEvict(value = "users", key = "#id")
     @Transactional
     public void toggleStatus(Long id, boolean active) {
         if (!userRepository.existsById(id)) throw new UserNotFoundException("User not found, id: " + id);

@@ -10,6 +10,7 @@ import com.userservice.exception.CardNotFoundException;
 import com.userservice.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.userservice.mapper.CardMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

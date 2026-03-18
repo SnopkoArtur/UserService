@@ -4,8 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class CardDto {
+public class CardDto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     @Pattern(regexp = "\\d{16}", message = "Card number must be 16 digits")
     private String number;
