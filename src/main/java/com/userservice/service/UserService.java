@@ -3,6 +3,7 @@ package com.userservice.service;
 import com.userservice.dao.UserRepository;
 import com.userservice.dto.UserDto;
 import com.userservice.entity.User;
+import com.userservice.exception.CardCountException;
 import com.userservice.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.userservice.mapper.UserMapper;
@@ -24,7 +25,7 @@ public class UserService {
     @Transactional
     public UserDto createUser(UserDto userDto) {
         if (userDto.getCards() != null && userDto.getCards().size() > 5) {
-            throw new RuntimeException("User cannot have more than 5 cards");
+            throw new CardCountException("User cannot have more than 5 cards");
         }
         User user = userMapper.toEntity(userDto);
 

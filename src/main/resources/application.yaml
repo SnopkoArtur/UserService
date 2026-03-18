@@ -1,18 +1,11 @@
 spring:
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/userservice}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:password}
+  application:
+    name: user-service
+  profiles:
+    active: local
   liquibase:
     change-log: classpath:db.changelog-master.yaml
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
-    show-sql: true
-  cache:
-    redis:
-      time-to-live: 600000
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
