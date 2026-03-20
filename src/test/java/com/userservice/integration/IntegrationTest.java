@@ -32,7 +32,7 @@ class IntegrationTest extends BaseIntegrationTest {
             card.setExpirationDate("12/29");
             card.setActive(true);
 
-            mockMvc.perform(post("/api/v1/cards/user/" + userId)
+            mockMvc.perform(post("/api/v1/users/" + userId + "/card")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(card)))
                     .andExpect(status().isCreated());
@@ -40,11 +40,19 @@ class IntegrationTest extends BaseIntegrationTest {
 
         CardDto extraCard = new CardDto();
         extraCard.setNumber("0000000000000000");
+        extraCard.setHolder("someholder");
         extraCard.setActive(true);
 
-        mockMvc.perform(post("/api/v1/cards/user/" + userId)
+        mockMvc.perform(post("/api/v1/users/" + userId + "/card")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(extraCard)))
                 .andExpect(status().isConflict());
+
+        mockMvc.perform(get("/api/v1/users/99999"))
+                .andExpect(status().isNotFound());
+
+
+        mockMvc.perform(get("/api/v1/cards/99999"))
+                .andExpect(status().isNotFound());
     }
 }

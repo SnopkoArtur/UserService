@@ -15,7 +15,7 @@ public class CardDto implements Serializable {
     private String number;
     @NotBlank(message = "Holder name is required")
     private String holder;
-    @Pattern(regexp = "(0[1-9]|1[0-2])/[2-9][0-9]", message = "Format MM/YY")
+    @Pattern(regexp = "(0[1-9]|1[0-2])/[2-9]\\d", message = "Format MM/YY")
     private String expirationDate;
     private boolean active;
 }

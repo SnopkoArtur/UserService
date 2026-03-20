@@ -6,7 +6,10 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
-public class UserSpecifications {
+public final class UserSpecifications {
+
+    private UserSpecifications() {}
+
     public static Specification<User> filterUsers(String name, String surname) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

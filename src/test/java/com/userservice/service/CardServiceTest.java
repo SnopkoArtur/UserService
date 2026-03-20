@@ -3,7 +3,6 @@ package com.userservice.service;
 import com.userservice.dao.CardRepository;
 import com.userservice.dao.UserRepository;
 import com.userservice.dto.CardDto;
-import com.userservice.dto.UserDto;
 import com.userservice.entity.PaymentCard;
 import com.userservice.entity.User;
 import com.userservice.exception.CardCountException;

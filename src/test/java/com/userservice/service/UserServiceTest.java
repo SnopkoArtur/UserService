@@ -124,14 +124,14 @@ class UserServiceTest {
 
     @Test
     void updateUser_Success() {
-        UserDto userDto = new UserDto();
-        userDto.setId(1L);
-        userDto.setName("Updated");
+        UserDto updatedUserDto = new UserDto();
+        updatedUserDto.setId(1L);
+        updatedUserDto.setName("Updated");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(any())).thenReturn(userDto);
+        when(userMapper.toDto(any())).thenReturn(updatedUserDto);
 
-        UserDto result = userService.updateUser(1L, userDto);
+        UserDto result = userService.updateUser(1L, updatedUserDto);
 
         assertEquals("Updated", result.getName());
         assertNotNull(result);
