@@ -11,35 +11,35 @@ import com.userservice.service.CardService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/cards")
+@RequestMapping("/api/v1/")
 @RequiredArgsConstructor
 public class CardController {
 
     private final CardService cardService;
 
-    @PostMapping("/user/{userId}")
+    @PostMapping("/users/{userId}/card")
     public ResponseEntity<CardDto> addCardToUser(
             @PathVariable Long userId,
             @Valid @RequestBody CardDto cardDto) {
         return new ResponseEntity<>(cardService.addCardToUser(userId, cardDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/cards/{id}")
     public ResponseEntity<CardDto> getCardById(@PathVariable Long id) {
         return ResponseEntity.ok(cardService.getCardById(id));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userId}/cards")
     public ResponseEntity<List<CardDto>> getCardsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(cardService.getCardsByUserId(userId));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/cards/{id}")
     public ResponseEntity<CardDto> updateCard(@PathVariable Long id, @Valid @RequestBody CardDto cardDto) {
         return ResponseEntity.ok(cardService.updateCard(id, cardDto));
     }
 
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/cards/{id}/status")
     public ResponseEntity<Void> toggleCardStatus(@PathVariable Long id, @RequestParam boolean active) {
         cardService.toggleCardStatus(id, active);
         return ResponseEntity.noContent().build();

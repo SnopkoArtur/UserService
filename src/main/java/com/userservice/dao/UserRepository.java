@@ -13,15 +13,12 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
-    @EntityGraph(attributePaths = {"cards"})
     Optional<User> findByEmail(String email);
 
     @Override
-    @EntityGraph(attributePaths = {"cards"})
     Page<User> findAll(Specification<User> spec, Pageable pageable);
 
     @Override
-    @EntityGraph(attributePaths = {"cards"})
     Optional<User> findById(Long id);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

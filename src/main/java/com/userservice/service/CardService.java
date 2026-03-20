@@ -10,18 +10,16 @@ import com.userservice.exception.CardNotFoundException;
 import com.userservice.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.userservice.mapper.CardMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CardService {
+    private static final long ACTIVE_CARD_LIMIT = 5;
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final CardMapper cardMapper;
@@ -29,12 +27,12 @@ public class CardService {
     @Transactional
     public CardDto addCardToUser(Long userId, CardDto cardDto) {
         User user = userRepository.findByIdWithLock(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found, id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found, id: " + userId));
 
         long activeCount = cardRepository.countByUserIdAndActiveTrue(userId);
 
-        if (cardDto.isActive() && activeCount >= 5) {
-            throw new CardCountException("Card limit (5) exceeded for this user");
+        if (cardDto.isActive() && activeCount >= ACTIVE_CARD_LIMIT) {
+            throw new CardCountException("Card limit ("+ ACTIVE_CARD_LIMIT + ") exceeded for this user");
         }
 
         PaymentCard card = cardMapper.toEntity(cardDto);
@@ -65,8 +63,8 @@ public class CardService {
             userRepository.findByIdWithLock(userId);
 
             long activeCount = cardRepository.countByUserIdAndActiveTrue(userId);
-            if (activeCount >= 5) {
-                throw new CardCountException("User already have 5 active cards");
+            if (activeCount >= ACTIVE_CARD_LIMIT) {
+                throw new CardCountException("User already have " + ACTIVE_CARD_LIMIT + " active cards");
             }
         }
 

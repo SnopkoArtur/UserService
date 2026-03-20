@@ -21,11 +21,12 @@ import com.userservice.specification.UserSpecifications;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private static final long ACTIVE_CARD_LIMIT = 5;
 
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        if (userDto.getCards() != null && userDto.getCards().size() > 5) {
-            throw new CardCountException("User cannot have more than 5 cards");
+        if (userDto.getCards() != null && userDto.getCards().size() > ACTIVE_CARD_LIMIT) {
+            throw new CardCountException("User cannot have more than "+ ACTIVE_CARD_LIMIT +" cards");
         }
         User user = userMapper.toEntity(userDto);
 

@@ -23,7 +23,7 @@ class IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long userId = objectMapper.readTree(response).get("id").asLong();
+        long userId = objectMapper.readTree(response).get("id").asLong();
 
         for (int i = 0; i < 5; i++) {
             CardDto card = new CardDto();
@@ -45,6 +45,6 @@ class IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/v1/cards/user/" + userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(extraCard)))
-                .andExpect(status().isBadRequest()); // Ожидаем ошибку лимита
+                .andExpect(status().isConflict());
     }
 }
