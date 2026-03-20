@@ -32,7 +32,7 @@ class IntegrationTest extends BaseIntegrationTest {
             card.setExpirationDate("12/29");
             card.setActive(true);
 
-            mockMvc.perform(post("/api/v1/users/" + userId + "/card")
+            mockMvc.perform(post("/api/v1/users/" + userId + "/cards")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(card)))
                     .andExpect(status().isCreated());
@@ -43,7 +43,7 @@ class IntegrationTest extends BaseIntegrationTest {
         extraCard.setHolder("someholder");
         extraCard.setActive(true);
 
-        mockMvc.perform(post("/api/v1/users/" + userId + "/card")
+        mockMvc.perform(post("/api/v1/users/" + userId + "/cards")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(extraCard)))
                 .andExpect(status().isConflict());
@@ -54,5 +54,97 @@ class IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/v1/cards/99999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void BadRequestTest() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setName("Validation");
+        userDto.setSurname("Test");
+        userDto.setEmail("val@test.com");
+
+        String userResponse = mockMvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        long userId = objectMapper.readTree(userResponse).get("id").asLong();
+
+        CardDto invalidCard = new CardDto();
+        invalidCard.setNumber("");
+        invalidCard.setHolder("Test Holder");
+        invalidCard.setExpirationDate("12/25");
+        invalidCard.setActive(true);
+
+        mockMvc.perform(post("/api/v1/users/" + userId + "/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidCard)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.validationErrors.number").exists());
+    }
+
+    @Test
+    void toggleUserStatus() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setName("Status");
+        userDto.setSurname("Test");
+        userDto.setEmail("status@test.com");
+        userDto.setActive(true);
+
+        String response = mockMvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        long userId = objectMapper.readTree(response).get("id").asLong();
+
+        mockMvc.perform(patch("/api/v1/users/" + userId + "/status")
+                        .param("active", "false"))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/users/" + userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(false));
+    }
+
+    @Test
+    void toggleCardStatus() throws Exception {
+        UserDto userDto = new UserDto();
+        userDto.setName("Card");
+        userDto.setSurname("Tester");
+        userDto.setEmail("card-test@example.com");
+
+        String userResponse = mockMvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        long userId = objectMapper.readTree(userResponse).get("id").asLong();
+
+        CardDto cardDto = new CardDto();
+        cardDto.setNumber("9999888877776666");
+        cardDto.setHolder("CARD TESTER");
+        cardDto.setExpirationDate("11/30");
+        cardDto.setActive(true);
+
+        String cardResponse = mockMvc.perform(post("/api/v1/users/" + userId + "/cards")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(cardDto)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        long cardId = objectMapper.readTree(cardResponse).get("id").asLong();
+
+        mockMvc.perform(patch("/api/v1/cards/" + cardId + "/status")
+                        .param("active", "false"))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/cards/" + cardId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(false));
     }
 }

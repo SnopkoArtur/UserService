@@ -17,7 +17,7 @@ public class CardController {
 
     private final CardService cardService;
 
-    @PostMapping("/users/{userId}/card")
+    @PostMapping("/users/{userId}/cards")
     public ResponseEntity<CardDto> addCardToUser(
             @PathVariable Long userId,
             @Valid @RequestBody CardDto cardDto) {
