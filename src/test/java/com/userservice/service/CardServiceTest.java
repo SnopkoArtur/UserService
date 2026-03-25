@@ -13,6 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +54,14 @@ class CardServiceTest {
         cardDto.setId(100L);
         cardDto.setActive(true);
     }
-
+    private void mockAuth(Long userId, String role) {
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                userId,
+                null,
+                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+        );
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
     @Test
     void addCardToUser_Success() {
         when(userRepository.findByIdWithLock(1L)).thenReturn(Optional.of(user));
@@ -76,6 +86,7 @@ class CardServiceTest {
 
     @Test
     void getCardById_Success() {
+        mockAuth(1L, "ADMIN");
         when(cardRepository.findById(100L)).thenReturn(Optional.of(card));
         when(cardMapper.toDto(card)).thenReturn(cardDto);
 
@@ -115,6 +126,7 @@ class CardServiceTest {
 
     @Test
     void updateCard_Success() {
+        mockAuth(1L, "ADMIN");
         CardDto cardDtoU = new CardDto();
         cardDtoU.setId(100L);
         cardDtoU.setNumber("1111222233334444");
