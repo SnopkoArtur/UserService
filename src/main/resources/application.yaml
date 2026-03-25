@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: user-service
+  profiles:
+    active: local
+  liquibase:
+    change-log: classpath:db.changelog-master.yaml
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
