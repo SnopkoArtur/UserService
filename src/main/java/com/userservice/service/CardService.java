@@ -47,11 +47,10 @@ public class CardService {
                 .orElseThrow(() -> new CardNotFoundException("Card not found: " + id));
 
         Long currentUserId = SecurityUtils.getCurrentUserId();
-        if (!SecurityUtils.hasRole("ADMIN")) {
-            if (!card.getUser().getId().equals(currentUserId)) {
-                throw new AccessDeniedException("You don't own this card");
-            }
+        if (!SecurityUtils.hasRole("ADMIN") && !card.getUser().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("You don't own this card");
         }
+
         return cardMapper.toDto(card);
 
     }
@@ -87,10 +86,8 @@ public class CardService {
                 .orElseThrow(() -> new CardNotFoundException("Card not found, id: " + id));
 
         Long currentUserId = SecurityUtils.getCurrentUserId();
-        if (!SecurityUtils.hasRole("ADMIN")) {
-            if (!card.getUser().getId().equals(currentUserId)) {
+        if (!SecurityUtils.hasRole("ADMIN") && !card.getUser().getId().equals(currentUserId)) {
                 throw new AccessDeniedException("You don't own this card");
-            }
         }
 
         card.setNumber(dto.getNumber());

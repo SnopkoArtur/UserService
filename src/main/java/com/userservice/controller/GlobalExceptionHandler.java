@@ -56,13 +56,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDto> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        log.error("Unexpected error occurred: ", ex);
+        log.error("AccessDenied error occurred: ", ex);
         return buildResponse(HttpStatus.FORBIDDEN, "Access denied: you don't have enough permissions", request, null);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponseDto> handleAuthException(AuthenticationException ex, HttpServletRequest request) {
-        log.error("Unexpected error occurred: ", ex);
+        log.error("Authentication error occurred: ", ex);
         return buildResponse(HttpStatus.UNAUTHORIZED, "Full authentication is required", request, null);
     }
 

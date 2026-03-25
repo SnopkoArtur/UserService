@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -93,6 +94,11 @@ class CardServiceTest {
         CardDto result = cardService.getCardById(100L);
 
         assertEquals(100L, result.getId());
+
+        mockAuth(9999L, "USER");
+
+        assertThrows(AccessDeniedException.class, () -> cardService.getCardById(100L));
+
     }
 
     @Test
@@ -140,5 +146,8 @@ class CardServiceTest {
         assertNotNull(result);
         verify(cardRepository).findById(100L);
 
+        mockAuth(9999L, "USER");
+
+        assertThrows(AccessDeniedException.class, () -> cardService.updateCard(100L, cardDtoU));
     }
 }
