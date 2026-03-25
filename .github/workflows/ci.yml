@@ -53,6 +53,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JWT_KEY: ${{secrets.JWT_KEY}}
+          SERVER_PORT: ${{secrets.SERVER_PORT}}
         run: |
           mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=SnopkoArtur_UserService \
