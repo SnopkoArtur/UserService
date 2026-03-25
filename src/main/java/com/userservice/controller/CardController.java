@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.userservice.service.CardService;
 
@@ -17,6 +18,8 @@ public class CardController {
 
     private final CardService cardService;
 
+
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal")
     @PostMapping("/users/{userId}/cards")
     public ResponseEntity<CardDto> addCardToUser(
             @PathVariable Long userId,
@@ -29,6 +32,7 @@ public class CardController {
         return ResponseEntity.ok(cardService.getCardById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal")
     @GetMapping("/user/{userId}/cards")
     public ResponseEntity<List<CardDto>> getCardsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(cardService.getCardsByUserId(userId));
@@ -39,6 +43,7 @@ public class CardController {
         return ResponseEntity.ok(cardService.updateCard(id, cardDto));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/cards/{id}/status")
     public ResponseEntity<Void> toggleCardStatus(@PathVariable Long id, @RequestParam boolean active) {
         cardService.toggleCardStatus(id, active);

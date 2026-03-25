@@ -8,8 +8,10 @@ import com.userservice.entity.User;
 import com.userservice.exception.CardCountException;
 import com.userservice.exception.CardNotFoundException;
 import com.userservice.exception.UserNotFoundException;
+import com.userservice.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import com.userservice.mapper.CardMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +43,16 @@ public class CardService {
     }
 
     public CardDto getCardById(Long id) {
-        return cardRepository.findById(id)
-                .map(cardMapper::toDto)
-                .orElseThrow(() -> new CardNotFoundException("Card not found, id: " + id));
+        PaymentCard card = cardRepository.findById(id)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + id));
+
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        if (!SecurityUtils.hasRole("ADMIN") && !card.getUser().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("You don't own this card");
+        }
+
+        return cardMapper.toDto(card);
+
     }
 
     public List<CardDto> getCardsByUserId(Long userId) {
@@ -75,6 +84,12 @@ public class CardService {
     public CardDto updateCard(Long id, CardDto dto) {
         PaymentCard card = cardRepository.findById(id)
                 .orElseThrow(() -> new CardNotFoundException("Card not found, id: " + id));
+
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        if (!SecurityUtils.hasRole("ADMIN") && !card.getUser().getId().equals(currentUserId)) {
+                throw new AccessDeniedException("You don't own this card");
+        }
+
         card.setNumber(dto.getNumber());
         card.setHolder(dto.getHolder());
         card.setExpirationDate(dto.getExpirationDate());

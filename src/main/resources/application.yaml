@@ -9,3 +9,5 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+jwt:
+  key: ${JWT_KEY}
