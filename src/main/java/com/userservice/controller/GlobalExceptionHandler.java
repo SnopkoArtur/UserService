@@ -4,6 +4,9 @@ import com.userservice.dto.ErrorResponseDto;
 import com.userservice.exception.CardCountException;
 import com.userservice.exception.CardNotFoundException;
 import com.userservice.exception.UserNotFoundException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.security.SignatureException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +68,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleAuthException(AuthenticationException ex, HttpServletRequest request) {
         log.error("Authentication error occurred: ", ex);
         return buildResponse(HttpStatus.UNAUTHORIZED, "Full authentication is required", request, null);
+    }
+
+    @ExceptionHandler({
+            SignatureException.class,
+            ExpiredJwtException.class,
+            MalformedJwtException.class,
+            UnsupportedJwtException.class,
+    })
+    public ResponseEntity<ErrorResponseDto> handleJwtExceptions(Exception ex, HttpServletRequest request) {
+        log.error("JWT Error: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid JWT token", request, null);
     }
 
     private ResponseEntity<ErrorResponseDto> buildResponse(HttpStatus status, String message, HttpServletRequest request, Map<String, String> validationErrors) {

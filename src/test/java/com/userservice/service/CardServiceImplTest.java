@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CardServiceTest {
+class CardServiceImplTest {
 
     @Mock
     private CardRepository cardRepository;
@@ -35,7 +35,7 @@ class CardServiceTest {
     private CardMapper cardMapper;
 
     @InjectMocks
-    private CardService cardService;
+    private CardServiceImpl cardService;
 
     private User user;
     private PaymentCard card;
