@@ -164,4 +164,27 @@ class IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.active").value(false));
     }
+
+    @Test
+    void deleteUserSuccess() throws Exception {
+        var adminAuth = getAuth(999L, "ADMIN");
+        UserDto userDto = new UserDto();
+        userDto.setName("Delete");
+        userDto.setSurname("Test");
+        userDto.setEmail("delete@test.com");
+        userDto.setActive(true);
+        String response = mockMvc.perform(post("/api/v1/users").with(authentication(adminAuth))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        long userId = objectMapper.readTree(response).get("id").asLong();
+
+        mockMvc.perform(delete("/api/v1/users/" + userId).with(authentication(adminAuth)))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/users/" + userId).with(authentication(adminAuth)))
+                .andExpect(status().is4xxClientError());
+    }
 }

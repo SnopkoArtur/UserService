@@ -137,4 +137,20 @@ class UserServiceImplTest {
         assertNotNull(result);
         verify(userRepository).findById(1L);
     }
+
+    @Test
+    void Delete_Success() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+
+        userService.deleteUser(1L);
+
+        verify(userRepository).deleteById(1L);
+    }
+
+    @Test
+    void Delete_Fail() {
+        when(userRepository.existsById(1L)).thenReturn(false);
+
+        assertThrows(UserNotFoundException.class, () ->  userService.deleteUser(1L));
+    }
 }
