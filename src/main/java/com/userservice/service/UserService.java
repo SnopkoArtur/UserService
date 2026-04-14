@@ -61,4 +61,11 @@ public interface UserService {
      */
     UserDto getUserByEmail(String email);
 
+    /**
+     * Deletes user by given
+     * Used for transaction cancellation
+     *
+     * @param id user id
+     */
+    void deleteUser(Long id);
 }
