@@ -1,69 +1,55 @@
 package com.userservice.service;
 
-import com.userservice.dao.UserRepository;
 import com.userservice.dto.UserDto;
-import com.userservice.entity.User;
-import com.userservice.exception.CardCountException;
-import com.userservice.exception.UserNotFoundException;
-import lombok.RequiredArgsConstructor;
-import com.userservice.mapper.UserMapper;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.userservice.specification.UserSpecifications;
 
-@Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class UserService {
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private static final long ACTIVE_CARD_LIMIT = 5;
+/**
+ * Service for user control
+ * Provides creation, update, search for users
+ */
+public interface UserService {
 
-    @Transactional
-    public UserDto createUser(UserDto userDto) {
-        if (userDto.getCards() != null && userDto.getCards().size() > ACTIVE_CARD_LIMIT) {
-            throw new CardCountException("User cannot have more than "+ ACTIVE_CARD_LIMIT +" cards");
-        }
-        User user = userMapper.toEntity(userDto);
+    /**
+     * Creates new user
+     *
+     * @param userDto user data
+     * @return saved user data
+     */
+    UserDto createUser(UserDto userDto);
 
-        if (user.getCards() != null) {
-            user.getCards().forEach(card -> card.setUser(user));
-        }
-        return userMapper.toDto(userRepository.save(user));
-    }
+    /**
+     * Provides user data by id
+     *
+     * @param id user id
+     * @return users data
+     */
+    UserDto getUserById(Long id);
 
-    @Cacheable(value = "users", key = "#id")
-    public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found, id: " + id));
-        return userMapper.toDto(user);
-    }
+    /**
+     * Return users page with filtration possibilities
+     *
+     * @param name     name for search
+     * @param surname  surname for search
+     * @param pageable pagination and sort params
+     * @return page with results
+     */
+    Page<UserDto> getAllUsers(String name, String surname, Pageable pageable);
 
-    public Page<UserDto> getAllUsers(String name, String surname, Pageable pageable) {
-        return userRepository.findAll(UserSpecifications.filterUsers(name, surname), pageable)
-                .map(userMapper::toDto);
-    }
+    /**
+     * Updates user data
+     *
+     * @param id      users id
+     * @param userDto new user data
+     * @return updated user data
+     */
+    UserDto updateUser(Long id, UserDto userDto);
 
-    @CacheEvict(value = "users", key = "#id")
-    @Transactional
-    public UserDto updateUser(Long id, UserDto userDto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found, id: " + id));
-
-        user.setName(userDto.getName());
-        user.setSurname(userDto.getSurname());
-        user.setEmail(userDto.getEmail());
-        return userMapper.toDto(user);
-    }
-
-    @CacheEvict(value = "users", key = "#id")
-    @Transactional
-    public void toggleStatus(Long id, boolean active) {
-        if (!userRepository.existsById(id)) throw new UserNotFoundException("User not found, id: " + id);
-        userRepository.updateStatus(id, active);
-    }
+    /**
+     * Changes activated status
+     *
+     * @param id     user id
+     * @param active new active status
+     */
+    void toggleStatus(Long id, boolean active);
 }
