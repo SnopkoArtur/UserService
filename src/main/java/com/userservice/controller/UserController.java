@@ -90,4 +90,15 @@ public class UserController {
         userService.toggleStatus(id, active);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Fetch user info by email
+     *
+     * @param email     user email
+     * @return 204
+     */
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
 }
