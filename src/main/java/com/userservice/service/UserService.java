@@ -52,4 +52,13 @@ public interface UserService {
      * @param active new active status
      */
     void toggleStatus(Long id, boolean active);
+
+    /**
+     *
+     *
+     * @param email user email
+     * @return user data
+     */
+    UserDto getUserByEmail(String email);
+
 }
