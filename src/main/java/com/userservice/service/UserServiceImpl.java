@@ -84,4 +84,14 @@ public class UserServiceImpl implements UserService{
         }
         return userMapper.toDto(user);
     }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "users", key = "#id")
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User not found, id: " + id);
+        }
+        userRepository.deleteById(id);
+    }
 }
