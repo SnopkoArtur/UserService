@@ -11,3 +11,19 @@ spring:
       ddl-auto: validate
 jwt:
   key: ${JWT_KEY}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+      group:
+        readiness:
+          include: readinessState, redis, db
+        liveness:
+          include: livenessState
+  endpoints:
+    web:
+      exposure:
+        include: health
